@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -8,14 +7,36 @@ namespace Kevin
     {
         private abstract class KevinState
         {
+            protected KevinAI AI;
+
+            protected KevinState(KevinAI ai)
+            {
+                AI = ai;
+            }
             public abstract void Update();
         }
 
         private class StalkState : KevinState
         {
+            private readonly KevinTarget[] _targets = FindObjectsOfType<KevinTarget>();
+            private int _targetIndex = 0;
+
+            private float _waitTime;
+
+            public StalkState(KevinAI ai) : base(ai)
+            {}
+
             public override void Update()
             {
-                // TODO
+                _waitTime -= Time.deltaTime;
+                if (_waitTime < 0f)
+                {
+                    _waitTime = 10f;
+                    _targetIndex = (_targetIndex + 1) % _targets.Length;
+                    AI._agent.SetDestination(_targets[_targetIndex].transform.position);
+                }
+
+                AI._agent.speed = AI._agent.remainingDistance < 6f ? AI.walkSpeed : AI.runSpeed;
             }
         }
         
@@ -36,7 +57,7 @@ namespace Kevin
 
         private void Start()
         {
-            _state = new StalkState();
+            _state = new StalkState(this);
         }
 
         // Update is called once per frame

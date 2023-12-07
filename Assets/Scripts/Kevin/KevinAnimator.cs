@@ -15,6 +15,7 @@ namespace Kevin
         {
             _animator = GetComponent<Animator>();
             _agent = GetComponent<NavMeshAgent>();
+            _ai = GetComponent<KevinAI>();
         }
 
         // Updates the animator's "speed" float based on its velocity and walk/run speed
