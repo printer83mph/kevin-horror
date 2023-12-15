@@ -136,8 +136,8 @@ MonoBehaviour:
   maxDistance: 5
   layerMask:
     serializedVersion: 2
-    m_Bits: 1
-  maxIntensity: 0.5
+    m_Bits: 1025
+  maxIntensity: 0.3
 --- !u!1 &4577031426706922631
 GameObject:
   m_ObjectHideFlags: 0
@@ -300,7 +300,8 @@ GameObject:
   - component: {fileID: 3432615408174200259}
   - component: {fileID: 1113560285930487665}
   - component: {fileID: 2995878577858270920}
-  - component: {fileID: 4135043679052785147}
+  - component: {fileID: 4651755360201828375}
+  - component: {fileID: 3819573600963294321}
   m_Layer: 0
   m_Name: Flashlight
   m_TagString: Untagged
@@ -554,8 +555,8 @@ MonoBehaviour:
   m_StartingSingleGrabTransformers: []
   m_StartingMultipleGrabTransformers: []
   m_AddDefaultGrabTransformers: 1
---- !u!64 &4135043679052785147
-MeshCollider:
+--- !u!136 &4651755360201828375
+CapsuleCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -572,7 +573,31 @@ MeshCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 2534964839176971238, guid: 486d32e9b08f7ba448704320ce063d78, type: 3}
+  serializedVersion: 2
+  m_Radius: 0.045
+  m_Height: 0.13756949
+  m_Direction: 2
+  m_Center: {x: 0, y: 0, z: 0.078799866}
+--- !u!136 &3819573600963294321
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9033346313594120405}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.025
+  m_Height: 0.24837218
+  m_Direction: 2
+  m_Center: {x: 0, y: 0, z: -0.07581391}
