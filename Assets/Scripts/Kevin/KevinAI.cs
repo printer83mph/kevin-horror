@@ -1,9 +1,6 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.SceneManagement;
 using Random = UnityEngine.Random;
 
 namespace Kevin
@@ -13,9 +10,13 @@ namespace Kevin
         private abstract class KevinState
         {
             protected readonly KevinAI AI;
+            protected KevinTarget[] _targets;
 
             protected KevinState(KevinAI ai)
-            { AI = ai; }
+            {
+                AI = ai;
+                _targets = FindObjectsOfType<KevinTarget>();
+            }
 
             public virtual void OnStateEnd()
             { }
@@ -29,7 +30,7 @@ namespace Kevin
 
         private class WanderState : KevinState
         {
-            private readonly KevinTarget[] _targets = new KevinTarget[3];
+            private readonly KevinTarget[] _primeTargets = new KevinTarget[3];
 
             public WanderState(KevinAI ai) : base(ai)
             { }
@@ -37,39 +38,50 @@ namespace Kevin
             public override void OnStateStart()
             {
                 AI._agent.speed = AI.walkSpeed;
-                AI.StartCoroutine(TargetsLoop(AI));
-                AI.StartCoroutine(WanderLoop(AI));
             }
 
-            private IEnumerator TargetsLoop(KevinAI ai)
+            private float _targetsTimer;
+            private float _destinationTimer;
+
+            public override void Update()
             {
-                while (true)
+                if (_targetsTimer < 0f)
                 {
-                    Debug.Log("Hello");
-                    Debug.Log(ai);
-                    // set three targets (farthest from player)
-                    Array.Sort(ai._targets, (a, b) => (int)Mathf.Sign(
-                        (b.transform.position - ai._camera.transform.position).sqrMagnitude -
-                        (a.transform.position - ai._camera.transform.position).sqrMagnitude)
-                    );
-
-                    for (var i = 0; i < 3; i++)
-                        _targets[i] = ai._targets[i];
-
-                    yield return new WaitForSeconds(1);
+                    UpdateTargets();
+                    _targetsTimer += 1f;
                 }
+
+                if (_destinationTimer < 0f)
+                {
+                    UpdateDestination();
+                    _destinationTimer += Random.Range(4.5f, 10f);
+                }
+
+                if (AI._agent.remainingDistance < 0.1f)
+                {
+                    _destinationTimer -= Time.deltaTime;
+                }
+
+                _targetsTimer -= Time.deltaTime;
             }
 
-            private IEnumerator WanderLoop(KevinAI ai)
+            private void UpdateTargets()
             {
-                while (true)
-                {
-                    var target = Mathf.FloorToInt(Random.value * 3f);
-                    ai._agent.SetDestination(_targets[target].transform.position);
-                    yield return new WaitForSeconds(Random.Range(4.5f, 20f));
-                }
+                // set three targets (farthest from player)
+                Array.Sort(_targets, (a, b) => (int)Mathf.Sign(
+                    (b.transform.position - AI._camera.transform.position).sqrMagnitude -
+                    (a.transform.position - AI._camera.transform.position).sqrMagnitude)
+                );
+
+                for (var i = 0; i < 3; i++)
+                    _primeTargets[i] = _targets[i];
             }
 
+            private void UpdateDestination()
+            {
+                var target = Mathf.FloorToInt(Random.value * 3f);
+                AI._agent.SetDestination(_primeTargets[target].transform.position);
+            }
         }
         
         // parameters
@@ -82,7 +94,6 @@ namespace Kevin
         // references
         private NavMeshAgent _agent;
         private Camera _camera;
-        private KevinTarget[] _targets;
 
         // internal logic
         private KevinState _state;
@@ -90,7 +101,6 @@ namespace Kevin
         private void SetState(KevinState newState)
         {
             _state?.OnStateEnd();
-            StopAllCoroutines();
             _state = newState;
             newState.OnStateStart();
         }
@@ -98,8 +108,7 @@ namespace Kevin
         private void Awake()
         {
             _agent = GetComponent<NavMeshAgent>();
-            _camera = Camera.current;
-            _targets = FindObjectsOfType<KevinTarget>();
+            _camera = Camera.main;
         }
 
         private void Start()

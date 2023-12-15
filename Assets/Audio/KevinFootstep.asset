@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 25d0ee04e0a6cb94a8942d91b217769c, type: 3}
+  m_Name: KevinFootstep
+  m_EditorClassIdentifier: 
+  clips:
+  - {fileID: 8300000, guid: fd35871ebc859cd4c91c5a7c3f9a47c6, type: 3}
+  - {fileID: 8300000, guid: 4519c88f3896f954f994f33d7a9f95c0, type: 3}
+  - {fileID: 8300000, guid: 4b98b45d64bb3ea4898c070af0142fcd, type: 3}
+  - {fileID: 8300000, guid: 3bde7d3ef79523546bffe0c035d46631, type: 3}
+  minVolume: 1.5
+  maxVolume: 2
+  minPitch: 1.2
+  maxPitch: 1.4
