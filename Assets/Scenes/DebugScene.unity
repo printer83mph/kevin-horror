@@ -2545,13 +2545,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 28573619851140580, guid: d83b52b49469f2745b55b14d5bbc915d, type: 3}
+      propertyPath: moveWithTransform
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 28573619851140580, guid: d83b52b49469f2745b55b14d5bbc915d, type: 3}
+      propertyPath: InitialModule.maxNumParticles
+      value: 300
+      objectReference: {fileID: 0}
     - target: {fileID: 276747023191812546, guid: d83b52b49469f2745b55b14d5bbc915d, type: 3}
       propertyPath: m_Name
       value: XR Origin (XR Rig)
-      objectReference: {fileID: 0}
-    - target: {fileID: 276747023191812546, guid: d83b52b49469f2745b55b14d5bbc915d, type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3738764799807894362, guid: d83b52b49469f2745b55b14d5bbc915d, type: 3}
       propertyPath: m_LocalPosition.x
