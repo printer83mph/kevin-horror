@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &6887023620614793025
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1807052994734760371}
+  m_Layer: 0
+  m_Name: Eyes
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1807052994734760371
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6887023620614793025}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0, y: 0.00122, z: 0.00116}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8210636130957370221}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &7956580805492617418
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10,15 +41,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 639f381bef52042acbbc7c8be43cc1bd, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 3.062
+      value: -12.651
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 639f381bef52042acbbc7c8be43cc1bd, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.00000011920929
+      value: 0.0014197826
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 639f381bef52042acbbc7c8be43cc1bd, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -4.52
+      value: -8.007
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 639f381bef52042acbbc7c8be43cc1bd, type: 3}
       propertyPath: m_LocalRotation.w
@@ -58,7 +89,10 @@ PrefabInstance:
       objectReference: {fileID: 9100000, guid: ae56595183b1c4dcf8a763207b7e6458, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: -6946382304006138969, guid: 639f381bef52042acbbc7c8be43cc1bd, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1807052994734760371}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 639f381bef52042acbbc7c8be43cc1bd, type: 3}
       insertIndex: -1
@@ -117,6 +151,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   walkSpeed: 1.2
   runSpeed: 5
+  headTransform: {fileID: 1807052994734760371}
+  flashlightAngleDeg: 30
+  flashlightMaxDistance: 10
+  flashlightLayerMask:
+    serializedVersion: 2
+    m_Bits: 1
 --- !u!114 &8988247804888124837
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -239,3 +279,8 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!4 &8210636130957370221 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -6946382304006138969, guid: 639f381bef52042acbbc7c8be43cc1bd, type: 3}
+  m_PrefabInstance: {fileID: 7956580805492617418}
+  m_PrefabAsset: {fileID: 0}
