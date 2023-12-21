@@ -127,6 +127,69 @@ namespace Kevin
                 AI.SetState(_nextState());
             }
         }
+
+        private class StalkState : KevinState
+        {
+            public enum AggressionLevel
+            {
+                GetNear = 1,
+                GetNearAndStop = 2,
+                GetNearAndPounce = 3
+            }
+
+            private AggressionLevel _aggression;
+            private float _subAggressionLevel;
+
+            public StalkState(KevinAI ai, AggressionLevel aggression) : base(ai)
+            {
+                _aggression = aggression;
+            }
+
+            public override void OnStateStart()
+            {
+                _subAggressionLevel = 0;
+                AI._agent.speed = AI.walkSpeed;
+                AI.StartCoroutine(Stalk());
+            }
+
+            public override void OnStateEnd()
+            {
+                AI.StopCoroutine(Stalk());
+            }
+            
+            public override void Update()
+            {
+                AI._agent.SetDestination(AI._camera.transform.position);
+                if (_aggression <= AggressionLevel.GetNear)
+                {
+                    if (AI.inLight)
+                    {
+                        AI.SetState(new FleeState(AI, () => new StalkState(AI, 0)));
+                        return;
+                    }
+                }
+
+                if (AI.canSeePlayer)
+                {
+                    _subAggressionLevel += Time.deltaTime * 0.05f * (Random.value + 0.5f);
+                }
+            }
+
+            private IEnumerator Stalk()
+            {
+                while (true)
+                {
+                    var minDistance = _aggression switch
+                    {
+                        AggressionLevel.GetNearAndPounce => 8f,
+                        AggressionLevel.GetNearAndStop => 10f,
+                        _ => 13f
+                    };
+
+                    yield return new WaitUntil(() => AI.canSeePlayer && AI._agent.remainingDistance <= minDistance);
+                }
+            }
+        }
         
         // parameters
         [SerializeField] private float walkSpeed = 2f;
@@ -191,6 +254,18 @@ namespace Kevin
                 var ray = new Ray(flashlightPos + flashlightForward * 0.1f, flashlightForward);
                 var maxRaycastDistance = (flashlightPos - headTransform.position).magnitude - 0.4f;
                 return !Physics.Raycast(ray, maxRaycastDistance, flashlightLayerMask);
+            }
+        }
+
+        private bool canSeePlayer
+        {
+            get
+            {
+                var vecToPlayer = _camera.transform.position - headTransform.position;
+                var ray = new Ray(headTransform.position, vecToPlayer);
+                var maxRaycastDistance = vecToPlayer.magnitude - 0.4f;
+                return !Physics.Raycast(ray, maxRaycastDistance, flashlightLayerMask);
+                
             }
         }
     }
