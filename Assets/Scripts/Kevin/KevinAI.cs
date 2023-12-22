@@ -29,9 +29,13 @@ namespace Kevin
             { }
         }
 
+        /**
+         * Wanders around at nodes far away from player, fleeing if the light is on him.
+         */
         private class WanderState : KevinState
         {
             private readonly KevinTarget[] _primeTargets = new KevinTarget[3];
+            private float _aggressionLevel;
 
             public WanderState(KevinAI ai) : base(ai)
             { }
@@ -39,6 +43,7 @@ namespace Kevin
             public override void OnStateStart()
             {
                 AI._agent.speed = AI.walkSpeed;
+                _aggressionLevel = 0f;
                 AI.StartCoroutine(UpdateTargetsLoop());
                 AI.StartCoroutine(UpdateDestinationLoop());
             }
@@ -51,7 +56,16 @@ namespace Kevin
             public override void Update()
             {
                 if (AI.inLight)
+                {
                     AI.SetState(new FleeState(AI, () => new WanderState(AI)));
+                    return;
+                }
+                
+                _aggressionLevel += Time.deltaTime * 0.025f * (Random.value + 0.5f);
+                if (_aggressionLevel >= 1f)
+                {
+                    AI.SetState(new StalkState(AI, StalkState.AggressionLevel.GetNear));
+                }
             }
 
             private IEnumerator UpdateTargetsLoop()
@@ -89,6 +103,9 @@ namespace Kevin
             }
         }
 
+        /**
+         * Flees to the node farthest from the player, then switches to a supplied next state.
+         */
         private class FleeState : KevinState
         {
             private readonly Func<KevinState> _nextState;
@@ -128,6 +145,10 @@ namespace Kevin
             }
         }
 
+        /**
+         * Attempts to get somewhat close to player, with varying responses to flashlight usage depending
+         * on aggression level. Eventually rushes player.
+         */
         private class StalkState : KevinState
         {
             public enum AggressionLevel
@@ -159,7 +180,10 @@ namespace Kevin
             
             public override void Update()
             {
+                // always target player
                 AI._agent.SetDestination(AI._camera.transform.position);
+                
+                // flee if low aggression
                 if (_aggression <= AggressionLevel.GetNear)
                 {
                     if (AI.inLight)
@@ -169,9 +193,31 @@ namespace Kevin
                     }
                 }
 
-                if (AI.canSeePlayer)
+                // rotate towards player if stood still
+                if (AI._agent.velocity.sqrMagnitude < AI.walkSpeed * AI.walkSpeed * 0.5f)
                 {
-                    _subAggressionLevel += Time.deltaTime * 0.05f * (Random.value + 0.5f);
+                    var vecToCamera = AI._camera.transform.position - AI.transform.position;
+                    var angleToCamera = Mathf.Atan2(vecToCamera.y, vecToCamera.x);
+                    var yAngle = Mathf.LerpAngle(AI.transform.rotation.eulerAngles.y, angleToCamera,
+                        4f * Time.deltaTime);
+
+                    AI.transform.rotation = Quaternion.AngleAxis(yAngle, Vector3.up);
+                }
+
+                // up aggression level if seeing player but not in light
+                if (AI.canSeePlayer && !AI.inLight)
+                {
+                    _subAggressionLevel += Time.deltaTime * 0.025f * (Random.value + 0.5f);
+                    if (_subAggressionLevel >= 1f)
+                    {
+                        // up aggression by 1
+                        _aggression = _aggression switch
+                        {
+                            AggressionLevel.GetNear => AggressionLevel.GetNearAndStop,
+                            _ => AggressionLevel.GetNearAndPounce
+                        };
+                        _subAggressionLevel = 0f;
+                    }
                 }
             }
 
@@ -186,8 +232,42 @@ namespace Kevin
                         _ => 13f
                     };
 
+                    // wait until close enough
                     yield return new WaitUntil(() => AI.canSeePlayer && AI._agent.remainingDistance <= minDistance);
+                    
+                    // wait until we reach aggression level 3, then pounce!
+                    yield return new WaitUntil(() => !AI.inLight && _aggression == AggressionLevel.GetNearAndPounce);
+                    AI.SetState(new PounceState(AI));
                 }
+            }
+        }
+
+        /**
+         * Runs at player like a maniac and kills them
+         */
+        private class PounceState : KevinState
+        {
+            public PounceState(KevinAI ai) : base(ai)
+            { }
+
+            public override void OnStateStart()
+            {
+                AI._agent.speed = AI.runSpeed;
+            }
+
+            public override void Update()
+            {
+                AI._agent.SetDestination(AI._camera.transform.position);
+
+                var sqrDistanceToPlayer = (AI._camera.transform.position - AI.headTransform.position).sqrMagnitude;
+                var maxLightDistance = 6f;
+                if (AI.inLight && sqrDistanceToPlayer < maxLightDistance * maxLightDistance)
+                {
+                    AI.SetState(new FleeState(AI, () => new WanderState(AI)));
+                    return;
+                }
+                
+                // TODO: kill player
             }
         }
         
