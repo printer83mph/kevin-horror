@@ -50,7 +50,8 @@ namespace Kevin
 
             public override void OnStateEnd()
             {
-                AI.StopAllCoroutines();
+                AI.StopCoroutine(UpdateTargetsLoop());
+                AI.StopCoroutine(UpdateDestinationLoop());
             }
 
             public override void Update()
@@ -61,7 +62,7 @@ namespace Kevin
                     return;
                 }
                 
-                _aggressionLevel += Time.deltaTime * 0.025f * (Random.value + 0.5f);
+                _aggressionLevel += Time.deltaTime * 0.05f * (Random.value + 0.5f);
                 if (_aggressionLevel >= 1f)
                 {
                     AI.SetState(new StalkState(AI, StalkState.AggressionLevel.GetNear));
@@ -120,7 +121,7 @@ namespace Kevin
             }
             
             public override void OnStateEnd()
-            { AI.StopAllCoroutines(); }
+            { AI.StopCoroutine(FleeRoutine()); }
 
             private IEnumerator FleeRoutine()
             {
@@ -175,6 +176,7 @@ namespace Kevin
 
             public override void OnStateEnd()
             {
+                AI._agent.isStopped = false;
                 AI.StopCoroutine(Stalk());
             }
             
@@ -188,6 +190,7 @@ namespace Kevin
                 {
                     if (AI.inLight)
                     {
+                        AI._agent.isStopped = false;
                         AI.SetState(new FleeState(AI, () => new StalkState(AI, 0)));
                         return;
                     }
@@ -197,7 +200,7 @@ namespace Kevin
                 if (AI._agent.velocity.sqrMagnitude < AI.walkSpeed * AI.walkSpeed * 0.5f)
                 {
                     var vecToCamera = AI._camera.transform.position - AI.transform.position;
-                    var angleToCamera = Mathf.Atan2(vecToCamera.y, vecToCamera.x);
+                    var angleToCamera = Mathf.Atan2(-vecToCamera.z, vecToCamera.x);
                     var yAngle = Mathf.LerpAngle(AI.transform.rotation.eulerAngles.y, angleToCamera,
                         4f * Time.deltaTime);
 
@@ -207,7 +210,7 @@ namespace Kevin
                 // up aggression level if seeing player but not in light
                 if (AI.canSeePlayer && !AI.inLight)
                 {
-                    _subAggressionLevel += Time.deltaTime * 0.025f * (Random.value + 0.5f);
+                    _subAggressionLevel += Time.deltaTime * 0.05f * (Random.value + 0.5f);
                     if (_subAggressionLevel >= 1f)
                     {
                         // up aggression by 1
@@ -234,9 +237,11 @@ namespace Kevin
 
                     // wait until close enough
                     yield return new WaitUntil(() => AI.canSeePlayer && AI._agent.remainingDistance <= minDistance);
+                    AI._agent.isStopped = true;
                     
                     // wait until we reach aggression level 3, then pounce!
                     yield return new WaitUntil(() => !AI.inLight && _aggression == AggressionLevel.GetNearAndPounce);
+                    AI._agent.isStopped = false;
                     AI.SetState(new PounceState(AI));
                 }
             }
@@ -345,7 +350,6 @@ namespace Kevin
                 var ray = new Ray(headTransform.position, vecToPlayer);
                 var maxRaycastDistance = vecToPlayer.magnitude - 0.4f;
                 return !Physics.Raycast(ray, maxRaycastDistance, flashlightLayerMask);
-                
             }
         }
     }

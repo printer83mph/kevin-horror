@@ -49,15 +49,10 @@ namespace Interactables
             if (_currentNumberIndex < 4) return;
             
             if (ValidateCode())
-            {
-                Debug.Log("Correct code input");
                 onCorrectCode.Invoke();
-            }
             else
-            {
                 Debug.Log("Wrong code input");
                 // wrong code idk do something
-            }
         }
 
         private void Awake()
